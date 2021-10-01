@@ -94,6 +94,7 @@ jobs:
           # Create a user with the same UID/GID and name as the existing user
           # outside of the container and allow it using sudo without password.
           useradd --home-dir $HOME --no-create-home --gid adm --uid 1001 runner
+
           echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
 
       - name: Install prerequisites
