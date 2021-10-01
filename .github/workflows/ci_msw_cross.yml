@@ -77,6 +77,7 @@ jobs:
     steps:
       - name: Install prerequisites
         run: |
+          apt-get -q -o=Dpkg::Use-Pty=0 update
           packages="git make wine x11-xserver-utils xvfb"
 
           case "${HOST_TRIPLET}" in
