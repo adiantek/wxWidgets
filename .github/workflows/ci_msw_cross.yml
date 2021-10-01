@@ -58,6 +58,7 @@ jobs:
       matrix:
         include:
           - name: wxMSW 64 bits
+            triplet: x86_64-w64-mingw32
             container: debian:sid-slim
           - name: wxMSW 32 bits
             triplet: i686-w64-mingw32
@@ -78,22 +79,22 @@ jobs:
       - name: Install prerequisites
         run: |
           apt-get -q -o=Dpkg::Use-Pty=0 update
-          packages="git make wine x11-xserver-utils xvfb"
+          packages="git make x11-xserver-utils xvfb"
 
           case "${HOST_TRIPLET}" in
             x86_64-w64-mingw32)
-              packages="$packages g++-mingw-w64-x86-64 wine64"
+              packages="$packages g++-mingw-w64-x86-64 wine wine64"
               winerun=wine64
               ;;
             aarch64-w64-mingw32)
-              packages="$packages g++-mingw-w64-x86-64 wine64"
-              winerun=wine64
+              packages="$packages"
+              winerun=unsupported
               ;;
 
             i686-w64-mingw32)
               dpkg --add-architecture i386
               apt-get -q -o=Dpkg::Use-Pty=0 update
-              packages="$packages g++-mingw-w64-i686 wine32 libgl1:i386"
+              packages="$packages g++-mingw-w64-i686 wine wine32 libgl1:i386"
               winerun=wine
               ;;
 
