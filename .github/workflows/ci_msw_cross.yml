@@ -90,8 +90,8 @@ jobs:
               ;;
 
             i686-w64-mingw32)
-              sudo dpkg --add-architecture i386
-              sudo apt-get -q -o=Dpkg::Use-Pty=0 update
+              dpkg --add-architecture i386
+              apt-get -q -o=Dpkg::Use-Pty=0 update
               packages="$packages g++-mingw-w64-i686 wine32 libgl1:i386"
               winerun=wine
               ;;
@@ -102,7 +102,7 @@ jobs:
               ;;
           esac
 
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -q -o=Dpkg::Use-Pty=0 -y install $packages
+          DEBIAN_FRONTEND=noninteractive apt-get -q -o=Dpkg::Use-Pty=0 -y install $packages
 
           echo "wxTEST_RUNNER=${winerun}" >> $GITHUB_ENV
 
@@ -153,8 +153,8 @@ jobs:
       - name: Launch Xvfb
         run: |
           echo 'Launching Xvfb...'
-          sudo mkdir /tmp/.X11-unix
-          sudo chmod 1777 /tmp/.X11-unix
+          mkdir /tmp/.X11-unix
+          chmod 1777 /tmp/.X11-unix
           Xvfb :10 -screen 0 1600x1200x24 &
           num_tries=1
           while true; do
