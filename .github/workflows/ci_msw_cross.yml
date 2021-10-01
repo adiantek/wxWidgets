@@ -84,7 +84,7 @@ jobs:
         # WORKAROUND for `setpriv: libcap-ng is too old for "all" caps`, previously "-all" was used here
         # create a list to drop all capabilities supported by current kernel
         # source: https://github.com/SinusBot/docker/pull/40/files
-        shell: /usr/bin/setpriv --reuid=runner --regid=adm --clear-groups --inh-caps="-cap_$(seq -s ",-cap_" 0 $(cat /proc/sys/kernel/cap_last_cap))" bash --noprofile --norc -eo pipefail {0}
+        shell: bash -c '/usr/bin/setpriv --reuid=runner --regid=adm --clear-groups --inh-caps="-cap_$(seq -s ",-cap_" 0 $(cat /proc/sys/kernel/cap_last_cap))" bash --noprofile --norc -eo pipefail {0}'
 
     steps:
       - name: Set up container user
