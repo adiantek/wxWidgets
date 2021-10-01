@@ -58,6 +58,9 @@ jobs:
           - configuration: 'DLL Release'
             platform: 'x64'
             vsversion: 2019
+          - configuration: 'DLL Release'
+            platform: 'arm64'
+            vsversion: 2019
 
     steps:
       - name: Checkout
