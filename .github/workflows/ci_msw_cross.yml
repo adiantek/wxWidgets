@@ -113,13 +113,16 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: System and environment setup
+      - name: Wine environment setup
+        if: ${{ matrix.triplet != 'aarch64-w64-mingw32' }}
         run: |
           # Add the directories containing MinGW and wx DLLs to Wine path.
           winepath="$(winepath --windows $(dirname $(${HOST_TRIPLET}-g++ -print-libgcc-file-name)))"
           winepath="${winepath};$(winepath --windows $(pwd)/lib)"
           echo "WINEPATH=${winepath}" >> $GITHUB_ENV
 
+      - name: Environment setup
+        run: |
           cpu_count=`nproc`
           ((cpu_count++))
           echo "wxMAKE_ARGS=-k -j$cpu_count" >> $GITHUB_ENV
@@ -153,6 +156,7 @@ jobs:
           make $wxMAKE_ARGS "CXXFLAGS=$wxMAKEFILE_ERROR_CXXFLAGS"
 
       - name: Launch Xvfb
+        if: ${{ matrix.triplet != 'aarch64-w64-mingw32' }}
         run: |
           echo 'Launching Xvfb...'
           mkdir /tmp/.X11-unix
@@ -182,6 +186,7 @@ jobs:
           echo 'DISPLAY=:10' >> $GITHUB_ENV
 
       - name: Run non-GUI tests
+        if: ${{ matrix.triplet != 'aarch64-w64-mingw32' }}
         working-directory: tests
         run: |
           # Some tests are currently failing under Wine while they pass under
@@ -209,6 +214,7 @@ jobs:
           $wxTEST_RUNNER ./test "${excluded_tests[@]}"
 
       - name: Run GUI tests
+        if: ${{ matrix.triplet != 'aarch64-w64-mingw32' }}
         working-directory: tests
         run: |
           # Same as for the non-GUI test above, except many more GUI tests fail
