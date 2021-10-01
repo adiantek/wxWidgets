@@ -90,13 +90,14 @@ jobs:
         run: |
           apt-get -q -o=Dpkg::Use-Pty=0 update
           apt-get -q -o=Dpkg::Use-Pty=0 -y install sudo
+  
           # Create a user with the same UID/GID and name as the existing user
           # outside of the container and allow it using sudo without password.
           useradd --home-dir $HOME --no-create-home --gid adm --uid 1001 runner
           echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
+          
       - name: Install prerequisites
         run: |
-          apt-get -q -o=Dpkg::Use-Pty=0 update
           packages="git make x11-xserver-utils xvfb"
 
           case "${HOST_TRIPLET}" in
@@ -175,8 +176,8 @@ jobs:
         if: ${{ matrix.triplet != 'aarch64-w64-mingw32' }}
         run: |
           echo 'Launching Xvfb...'
-          mkdir /tmp/.X11-unix
-          chmod 1777 /tmp/.X11-unix
+          sudo mkdir /tmp/.X11-unix
+          sudo chmod 1777 /tmp/.X11-unix
           Xvfb :10 -screen 0 1600x1200x24 &
           num_tries=1
           while true; do
