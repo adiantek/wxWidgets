@@ -75,7 +75,25 @@ jobs:
       # correctly, so set the locale explicitly for it.
       LC_ALL: C.UTF-8
 
+    # Run all commands as the normal user, created by the first step below.
+    #
+    # Note that the Bash options used here are the same as for the default
+    # shell used by GitHub Actions to minimize any surprises.
+    defaults:
+      run:
+        shell: /usr/bin/setpriv --reuid=runner --regid=adm --clear-groups --inh-caps=-all bash --noprofile --norc -eo pipefail {0}
+
     steps:
+      - name: Set up container user
+        # Specify the default shell explicitly to override the default value above.
+        shell: bash
+        run: |
+          apt-get -q -o=Dpkg::Use-Pty=0 update
+          apt-get -q -o=Dpkg::Use-Pty=0 -y install sudo
+          # Create a user with the same UID/GID and name as the existing user
+          # outside of the container and allow it using sudo without password.
+          useradd --home-dir $HOME --no-create-home --gid adm --uid 1001 runner
+          echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
       - name: Install prerequisites
         run: |
           apt-get -q -o=Dpkg::Use-Pty=0 update
@@ -92,8 +110,8 @@ jobs:
               ;;
 
             i686-w64-mingw32)
-              dpkg --add-architecture i386
-              apt-get -q -o=Dpkg::Use-Pty=0 update
+              sudo dpkg --add-architecture i386
+              sudo apt-get -q -o=Dpkg::Use-Pty=0 update
               packages="$packages g++-mingw-w64-i686 wine wine32 libgl1:i386"
               winerun=wine
               ;;
@@ -104,7 +122,7 @@ jobs:
               ;;
           esac
 
-          DEBIAN_FRONTEND=noninteractive apt-get -q -o=Dpkg::Use-Pty=0 -y install $packages
+          sudo  DEBIAN_FRONTEND=noninteractive apt-get -q -o=Dpkg::Use-Pty=0 -y install $packages
 
           echo "wxTEST_RUNNER=${winerun}" >> $GITHUB_ENV
 
